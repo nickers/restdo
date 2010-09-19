@@ -6,5 +6,5 @@ from api.handlers import BookHandler
 book_handler = Resource(BookHandler)
 
 urlpatterns = patterns('',
-   url(r'^book/(?P<param>[^/]+)/', book_handler, { 'emitter_format': 'xml' }),
+   url(r'^book/(?P<book_slug>[^/]+)/', book_handler, { 'emitter_format': 'json' }),
 )
