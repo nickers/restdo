@@ -9,3 +9,10 @@ class BookLend(models.Model):
 	request_time = models.DateTimeField('lend request date', auto_now_add=True)
 	lend_time = models.DateTimeField('lend date', null=True)
 	return_time = models.DateTimeField('returns date', null=True)
+	
+	def isEmpty(self):
+		attrs = ['book','reader','request_time']
+		for a in attrs:
+			if getattr(self, a)==None:
+				return True
+		return False
