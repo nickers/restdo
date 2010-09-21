@@ -129,19 +129,28 @@ class Resource(object):
         # very well have `oauth_`-headers in there, and we
         # don't want to pass these along to the handler.
         request = self.cleanup_request(request)
-        
+
+        def call_piston_precondition(meth, *args, **kwargs):
+            if hasattr(meth, 'piston_precondition_decorator'):
+                @meth.piston_precondition_decorator
+                def fake_controller(request, *args, **kwargs):
+                    return rc.ALL_OK
+                return fake_controller(request, *args, **kwargs)
+            return rc.ALL_OK
+
         etag=None
-        if hasattr(meth, 'piston_precondition_decorator'):
-            @meth.piston_precondition_decorator
-            def fake_controller(request, *args, **kwargs):
-                return rc.ALL_OK
-            response = fake_controller(request, *args, **kwargs)
-            if response.status_code == 304:
-                return response
-            elif response.has_header('ETag'):
-                etag = response['ETag']
+        response = call_piston_precondition(meth, *args, **kwargs)
+        if response.status_code != 200:
+            return response
+            
         try:
             result = meth(request, *args, **kwargs)
+
+            # get new etag - it might have been changed
+            tmp_r = call_piston_precondition(meth, *args, **kwargs)
+            if tmp_r.has_header('ETag'):
+                etag = tmp_r['ETag']
+            
         except FormValidationError, e:
             resp = rc.BAD_REQUEST
             resp.write(' '+str(e.form.errors))
