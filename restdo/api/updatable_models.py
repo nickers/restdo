@@ -14,23 +14,22 @@ import urllib
 
 ## self explanatory ;)
 def md5sum(obj):
-		return hashlib.md5(unicode(obj).encode("iso-8859-1","ignore"))\
-		.hexdigest()
+	dict = {}
+	for o in obj.__dict__:
+		if o[0]!='_':
+			dict[o] = obj.__dict__[o]
+	return hashlib.md5(unicode(dict).encode("iso-8859-1","ignore")).hexdigest()
 
 def md5func(model):
 	def md5tag_book(request, **kwargs):
 		try:
-			obj = model.objects.get(**kwargs)
-			if obj.isEmpty():
-				return None
-			return md5sum(obj)
+			return md5sum(model.objects.get(**kwargs))
 		except model.DoesNotExist:
 			return None
 		except:
 			print "Should I do some debugging? Btw. yous md5tag function sucks!"
-			print " -> failed for: ", model, slug
 			return None
-	return
+	return md5tag_book
 	
 
 class UpdatableModels(BaseHandler):
