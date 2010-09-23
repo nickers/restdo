@@ -2,11 +2,9 @@
 #from django.views.decorators.http import etag
 from django.http import QueryDict, HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
-from django.core.exceptions import ObjectDoesNotExist
 from piston.handler import BaseHandler, etag
 from django.forms import ValidationError
 from piston.utils import rc
-from books.models import Book
 
 import simplejson as json
 import hashlib
@@ -70,12 +68,20 @@ class UpdatableModels(BaseHandler):
 
 
 	def update(self, request, **kwargs):
-		obj = self.model.objects.get(**kwargs)
-		json_data = self.flatten_dict(request)
+		ret = rc.ALL_OK
 
-		# require etag for non-empty objects
-		if not (obj.isEmpty() or ("HTTP_IF_MATCH" in request.META)):
-			return HttpResponse(status=412) # precondition failed
+		try:
+			obj = self.model.objects.get(**kwargs)
+
+			# require etag for non-empty objects
+			if not (obj.isEmpty() or ("HTTP_IF_MATCH" in request.META)):
+				return HttpResponse(status=412) # precondition failed
+		except self.model.DoesNotExist:
+			obj = self.model()
+			obj.id = kwargs['id']
+			ret = rc.CREATED
+
+		json_data = self.flatten_dict(request)
 
 		for prop in json_data:
 			try:
@@ -95,5 +101,15 @@ class UpdatableModels(BaseHandler):
 			bad_request['Content-Type'] = 'application/json; charset=utf-8'
 			return bad_request
 			
-		return obj
-		
+		return ret
+
+	def delete(self, request, **kwargs):
+		try:
+			obj = self.model.objects.get(**kwargs)
+			# require etag for non-empty objects
+			if not (obj.isEmpty() or ("HTTP_IF_MATCH" in request.META)):
+				return HttpResponse(status=412) # precondition failed
+		except self.model.DoesNotExist:
+			None
+		return super(UpdatableModels, self).delete(request, **kwargs)
+

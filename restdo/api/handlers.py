@@ -19,3 +19,7 @@ class BookHandler(UpdatableModels):
 	@etag(md5func(Book))
 	def update(self, request, *args, **kwargs):
 		return super(BookHandler, self).update(request, **kwargs)
+
+	@etag(md5func(Book))
+	def delete(self, request, *args, **kwargs):
+		return super(BookHandler, self).delete(request, **kwargs)
