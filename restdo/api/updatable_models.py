@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from django.views.decorators.http import etag
-from django.http import QueryDict, HttpResponseRedirect
+#from django.views.decorators.http import etag
+from django.http import QueryDict, HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from piston.handler import BaseHandler, etag
@@ -23,6 +23,7 @@ def md5sum(obj):
 def md5func(model):
 	def md5tag_book(request, **kwargs):
 		try:
+			print 'Last generated etag: ', md5sum(model.objects.get(**kwargs))
 			return md5sum(model.objects.get(**kwargs))
 		except model.DoesNotExist:
 			return None
@@ -30,13 +31,13 @@ def md5func(model):
 			print "Should I do some debugging? Btw. yous md5tag function sucks!"
 			return None
 	return md5tag_book
-	
+
 
 class UpdatableModels(BaseHandler):
 	allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')
-	#model = Book
-	
-	
+	url_name = None
+
+
 	def flatten_dict(self, request):
 		"""
 		Return dictionary containing model data.
@@ -46,11 +47,9 @@ class UpdatableModels(BaseHandler):
 			raw_data = urllib.unquote_plus(request.urlencode()).rstrip("=")
 		else:
 			raw_data = request.raw_post_data
-
 		return json.loads(unicode(raw_data, 'utf-8'), 'utf-8')
-		
-	
-	#@etag(md5func(Book))
+
+
 	def read(self, request, *args, **kwargs):
 		obj = super(UpdatableModels, self).read(request, *args, **kwargs)
 		if hasattr(obj,'isEmpty') and obj.isEmpty():
@@ -59,6 +58,7 @@ class UpdatableModels(BaseHandler):
 			obj = obj.filter(**self.model.notEmptyFilter())
 		return obj
 
+
 	def create(self, request, *args, **kwargs):
 		pkfield = self.model._meta.pk.name
 		if pkfield in kwargs and kwargs[pkfield]!='':
@@ -66,16 +66,16 @@ class UpdatableModels(BaseHandler):
 		inst = self.model()
 		inst.save()
 
-		return HttpResponseRedirect(reverse('books_api',kwargs={'id':inst.id}))
-		return rc.ALL_OK
-		#return super(UpdatableModels, self).create(request, *args, **kwargs)
-		
-		# object exists - can't create, must update
-		return rc.DUPLICATE_ENTRY
-	
+		return HttpResponseRedirect(reverse(self.url_name, kwargs={'id':inst.id}))
+
+
 	def update(self, request, **kwargs):
 		obj = self.model.objects.get(**kwargs)
 		json_data = self.flatten_dict(request)
+
+		# require etag for non-empty objects
+		if not (obj.isEmpty() or ("HTTP_IF_MATCH" in request.META)):
+			return HttpResponse(status=412) # precondition failed
 
 		for prop in json_data:
 			try:
