@@ -7,6 +7,7 @@ from books_lends.models import BookLend
 from readers.models import Reader
 from api.updatable_models import UpdatableModels, md5func
 import re
+from datetime import datetime
 
 per_page_items = 5
 	
@@ -104,3 +105,45 @@ class ReadersListHandler(ReaderHandler):
 		if len(list)==0:
 			return rc.NOT_HERE
 		return list
+
+#### #### #### #### ####
+class BooksQueueHandler(BaseHandler):
+	allowed_methods = ('GET', 'DELETE')# 'POST', 'PUT', 'DELETE')
+	model = BookLend
+	##exclude = (re.compile('^private_'), 'book')
+
+	def getBooksQuery(self, book_id):
+		query = BookLend.objects.filter(book__id=book_id)
+		query = query.filter(**BookLend.notEmptyFilter())
+		query = query.filter(return_time__exact=None) # not given back only
+		query = query.order_by('request_time')
+		return query
+
+	def updateQueue(self, book_id):
+		query = self.getBooksQuery(book_id)
+		item = query[0]
+		doUpdate = True
+		for entry in query:
+			if entry.lend_time!=None:
+				doUpdate = False
+		if doUpdate:
+			item.lend_time = datetime.now()
+			item.save()
+
+	def read(self, request, book_id, **kwargs):
+		print kwargs
+		try:
+			book = Book.objects.get(pk=book_id)
+			del book
+		except Book.DoesNotExist:
+			return rc.NOT_HERE
+		query = self.getBooksQuery(book_id)
+		return query
+
+	@etag(md5func(BookLend))
+	def delete(self, request, book_id, **kwargs):
+		book_handler = BookLendHandler()
+		r = book_handler.delete(request, id=kwargs['id'])
+		self.updateQueue(book_id)
+		return r
+		#return BaseHandler.delete(book_handler, request, id=kwargs['id'])

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.conf.urls.defaults import *
 from piston.resource import Resource
-from api.handlers import BookHandler, BooksListHandler, BookLendHandler, BookLendsListHandler, ReaderHandler, ReadersListHandler
+from api.handlers import BookHandler, BooksListHandler, BookLendHandler, BookLendsListHandler, ReaderHandler, ReadersListHandler, BooksQueueHandler
 
 book_handler = Resource(BookHandler)
 books_list_handler = Resource(BooksListHandler)
@@ -12,6 +12,8 @@ book_lends_list_handler = Resource(BookLendsListHandler)
 reader_handler = Resource(ReaderHandler)
 readers_list_handler = Resource(ReadersListHandler)
 
+books_queue_handler = Resource(BooksQueueHandler)
+
 urlpatterns = patterns('',
    url(r'^book/page-(?P<page_number>[0-9]+)$', books_list_handler, { 'emitter_format': 'json'}),
    url(r'^book/id-(?P<id>[^/]+)$', book_handler, { 'emitter_format': 'json' }, 'books_api'),
@@ -21,4 +23,8 @@ urlpatterns = patterns('',
 
    url(r'^reader/page-(?P<page_number>[0-9]+)$', readers_list_handler, { 'emitter_format': 'json'}),
    url(r'^reader/id-(?P<id>[^/]+)$', reader_handler, { 'emitter_format': 'json' }, 'reader_api'),
+
+   # r'^book/id-(?P<book_id>[^/]+)/queue/$
+   url(r'^book/id-(?P<book_id>[^/]+)/queue$', books_queue_handler, { 'emitter_format': 'json' }, 'queue_api'),
+   url(r'^book/id-(?P<book_id>[^/]+)/queue/(?P<id>[^/]+)$', books_queue_handler, { 'emitter_format': 'json' }),
 )
