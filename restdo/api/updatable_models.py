@@ -84,8 +84,20 @@ class UpdatableModels(BaseHandler):
 		json_data = self.flatten_dict(request)
 
 		for prop in json_data:
+			if prop=='id':
+				continue
 			try:
-				setattr(obj, prop, json_data.get(prop))
+				value = json_data.get(prop)
+				if hasattr(self.model, prop):
+					field_model = getattr(self.model, prop).field.related.parent_model
+					value = field_model.objects.get(pk=value)
+				setattr(obj, prop, value)
+			except field_model.DoesNotExist:
+				bad_request = rc.BAD_REQUEST
+				msg = {'invalid_key':prop, 'msg':'No object with this id.'}
+				bad_request.content = json.dumps(msg, encoding='utf-8')
+				bad_request['Content-Type'] = 'application/json; charset=utf-8'
+				return bad_request
 			except:
 				bad_request = rc.BAD_REQUEST
 				msg = {'invalid_key':prop, 'msg':'Invalid key provided.'}
