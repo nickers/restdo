@@ -11,7 +11,9 @@ class BookLend(models.Model):
 	return_time = models.DateTimeField('returns date', null=True, blank=True)
 
 	def __unicode__(self):
-		return u"<%s> - %s / %s -> %s to %s"%(self.book, self.reader, self.request_time, self.lend_time, self.return_time)
+		if self.isEmpty():
+			return u"(empty)"
+		return u"[%s], by:%s[%s] -> from '%s' to '%s'"%(self.book, self.reader, self.request_time, self.lend_time, self.return_time)
 
 	def isEmpty(self):
 		attrs = ['book','reader','request_time']
