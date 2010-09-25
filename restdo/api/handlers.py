@@ -135,9 +135,8 @@ def md5tag_queue(request, **kwargs):
 
 
 class BooksQueueHandler(BaseHandler):
-	allowed_methods = ('GET', 'DELETE')# 'POST', 'PUT', 'DELETE')
-	model = BookLend
-	##exclude = (re.compile('^private_'), 'book')
+	allowed_methods = ('GET', 'DELETE')
+	exclude = ('__private',)
 
 	def getBooksQuery(self, book_id):
 		query = BookLend.objects.filter(book__id=book_id)
@@ -155,7 +154,10 @@ class BooksQueueHandler(BaseHandler):
 
 	def updateQueue(self, book_id):
 		query = self.getBooksQuery(book_id)
-		item = query[0]
+		try:
+			item = query[0]
+		except:
+			return
 		doUpdate = True
 		for entry in query:
 			if entry.lend_time!=None:
@@ -180,12 +182,17 @@ class BooksQueueHandler(BaseHandler):
 		query = self.getBooksQuery(book_id)
 		return query
 
-	#@etag(md5func(BookLend))
+	@etag(md5tag_queue)
 	def delete(self, request, book_id, **kwargs):
 		if 'id' not in kwargs:
 			return HttpResponse(status=405)
-		book_handler = BookLendHandler()
-		r = book_handler.delete(request, id=kwargs['id'])
+		lend = self.getBooksQueryItem(book_id, kwargs['id'])
+		if lend==None:
+			return rc.NOT_HERE
+		# require etag for non-empty objects
+		if not (lend.isEmpty() or ("HTTP_IF_MATCH" in request.META)):
+			return HttpResponse(status=412) # precondition failed
+		lend.return_time = datetime.now()
+		lend.save()
 		self.updateQueue(book_id)
-		return r
-		#return BaseHandler.delete(book_handler, request, id=kwargs['id'])
+		return rc.DELETED
