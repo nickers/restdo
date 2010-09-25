@@ -5,9 +5,11 @@ from piston.utils import rc
 from books.models import Book
 from books_lends.models import BookLend
 from readers.models import Reader
-from api.updatable_models import UpdatableModels, md5func
+from api.updatable_models import UpdatableModels, md5func, md5sum
 import re
 from datetime import datetime
+import hashlib
+from django.http import HttpResponse
 
 per_page_items = 5
 	
@@ -107,6 +109,31 @@ class ReadersListHandler(ReaderHandler):
 		return list
 
 #### #### #### #### ####
+
+def md5tag_queue(request, **kwargs):
+	try:
+		bqh = BooksQueueHandler()
+		val = ""
+		if 'id' in kwargs:
+			obj = bqh.getBooksQueryItem(kwargs['book_id'], kwargs['id'])
+			val = md5sum(obj)
+		else:
+			obj = bqh.getBooksQuery(kwargs['book_id'])
+			for o in obj:
+				val = val + md5sum(o)
+				val = hashlib.md5(unicode(val).encode("iso-8859-1","ignore")).hexdigest()
+			if val=="":
+				val = None
+		print 'Last generated etag: ', val
+		return val
+	except BookLend.DoesNotExist:
+		return None
+	except:
+		print "Should I do some debugging? Btw. yous md5tag function sucks!"
+		return None
+
+
+
 class BooksQueueHandler(BaseHandler):
 	allowed_methods = ('GET', 'DELETE')# 'POST', 'PUT', 'DELETE')
 	model = BookLend
@@ -119,6 +146,13 @@ class BooksQueueHandler(BaseHandler):
 		query = query.order_by('request_time')
 		return query
 
+	def getBooksQueryItem(self, book_id, id):
+		query = self.getBooksQuery(book_id)
+		query = query.filter(id=id)
+		if len(query)==0:
+			return None
+		return query[0]
+
 	def updateQueue(self, book_id):
 		query = self.getBooksQuery(book_id)
 		item = query[0]
@@ -130,18 +164,26 @@ class BooksQueueHandler(BaseHandler):
 			item.lend_time = datetime.now()
 			item.save()
 
+	@etag(md5tag_queue)
 	def read(self, request, book_id, **kwargs):
-		print kwargs
 		try:
 			book = Book.objects.get(pk=book_id)
 			del book
 		except Book.DoesNotExist:
 			return rc.NOT_HERE
+
+		if 'id' in kwargs:
+			item = self.getBooksQueryItem(book_id, kwargs['id'])
+			if item==None:
+				return rc.NOT_HERE
+			return item
 		query = self.getBooksQuery(book_id)
 		return query
 
-	@etag(md5func(BookLend))
+	#@etag(md5func(BookLend))
 	def delete(self, request, book_id, **kwargs):
+		if 'id' not in kwargs:
+			return HttpResponse(status=405)
 		book_handler = BookLendHandler()
 		r = book_handler.delete(request, id=kwargs['id'])
 		self.updateQueue(book_id)
