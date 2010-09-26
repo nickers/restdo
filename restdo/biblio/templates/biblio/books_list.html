@@ -1,8 +1,6 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-	"http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-	<title></title>
+{% extends "biblio/base.html" %}
+
+{% block css %}
 	<style type="text/css">
 		h2.empty {
 			text-align: center;
@@ -27,8 +25,8 @@
 			background-color: #cfc;
 		}
 	</style>
-</head>
-<body>
+{% endblock %}
+{% block content %}
 
 <form action="{% url edytuj_ksiazke None %}" method="get"><input type="submit" value="Dodaj" /></form>
 
@@ -61,5 +59,4 @@
 	<h2 class="empty"><i>Pusto! :(</i></h2>
 {% endif %}
 
-</body>
-</html>
+{% endblock %}

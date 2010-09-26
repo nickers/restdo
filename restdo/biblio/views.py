@@ -35,9 +35,12 @@ def list_books(request, page):
 def edit_book(request, id):
 	if request.method=="POST":
 		obj = request.POST
-		id = etagBook.createNewId()
-
-		r = etagBook(id, 'get', run=False)
+		if id=="":
+			id = etagBook.createNewId()
+			r = etagBook(id, 'get', run=False)
+		else:
+			id=int(id)
+			r = etagBook(id, 'get')
 		r.put(obj)
 		return HttpResponseRedirect(reverse('edytuj_ksiazke', args=[id]))
 
