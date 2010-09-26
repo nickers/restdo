@@ -1,0 +1,61 @@
+{% extends "biblio/base.html" %}
+
+{% block css %}
+	<style type="text/css">
+		h2.empty {
+			text-align: center;
+			color:#aca;
+			padding: 80px 10px;
+			border: 1px solid #000;
+			margin-top: 15px;
+		}
+		table {
+			width: 100%;
+			margin-top: 15px;
+		}
+		th {
+			border: 1px solid #000;
+			background: #252;
+			color: #efe;
+		}
+		td {
+			border-bottom: 1px dashed #050;
+		}
+		tr:hover {
+			background-color: #cfc;
+		}
+	</style>
+{% endblock %}
+{% block content %}
+
+<form action="{% url edytuj_czytelnika None %}" method="get"><input type="submit" value="Dodaj" /></form>
+
+{% if page > 0 %}[ <a href="{% url lista_czytelnikow page|add:"-1" %}">Poprzednia</a> ]{% endif %}
+{% if readers %}
+	[ <a href="{% url lista_czytelnikow page|add:"1" %}">Następna</a> ]
+	<table>
+		<tr>
+			<th>#</th>
+			<th>Imię</th>
+			<th>Nazwisko</th>
+			<th>Adres</th>
+			<th></th>
+		</tr>
+	{% for reader in readers %}
+		<tr>
+			<td>{{ reader.id }}</td>
+			<td>{{ reader.first_name }}</td>
+			<td>{{ reader.last_name }}</td>
+			<td>{{ reader.address }}</td>
+			<td style="text-align: center;">
+				<input onclick="javascript:document.location='{% url edytuj_czytelnika reader.id %}'" type="button" value="Edytuj" />
+			</td>
+		</tr>
+	{% endfor %}
+
+	</table>
+{% else %}
+	<h2 class="empty"><i>Pusto! :(</i></h2>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "biblio/base.html" %}
+
+{% block content %}
+
+{% if reader.id %}
+	<form action="{% url usun_czytelnika reader.id %}" class="edit_form alert" method="get">
+		<input type="submit" value="Usuń" />
+	</form>
+{% endif %}
+
+<form class="edit_form" action="{% url edytuj_czytelnika reader.id %}" method="post">
+	{% if reader.id %}<input type="hidden" value="{{ reader.id }}" name="id" />#{{ reader.id }}{% endif %}
+	<table>
+		<tr>
+			<td> <b>Imię:</b> </td><td> <input type="text" value="{{ reader.first_name }}" name="first_name" /> </td>
+		</tr>
+		<tr>
+			<td> <b>Nazwisko:</b> </td><td> <input type="text" value="{{ reader.last_name }}" name="last_name" /> </td>
+		</tr>
+		<tr>
+			<td> <b>Adres:</b> </td><td> <input type="text" value="{{ reader.address }}" name="address" /> </td>
+		</tr>
+	</table>
+	<input type="submit" value="Zapisz" />
+</form>
+
+{% endblock %}
