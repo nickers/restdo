@@ -104,5 +104,6 @@ INSTALLED_APPS = (
 
 ## ## ##
 ETAG_RES_SERVER = 'http://localhost:8000/api/'
-ETAG_BOOK_URI = ETAG_RES_SERVER + 'book/id-%d'
+ETAG_BOOK_URI = ETAG_RES_SERVER + 'book/%s'
 ETAG_BOOKS_LIST_URI = ETAG_RES_SERVER + 'book/page-%d'
+ETAG_BOOK_POST =  ETAG_RES_SERVER + 'book/'

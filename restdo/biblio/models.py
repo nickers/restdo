@@ -10,32 +10,61 @@ class etagResource(object):
 		self.method = method
 		self.resource = Resource(self.uri)
 
-	def execute(self, headers=None):
-		self.set_result(getattr(self.resource, self.method)(headers=headers))
+	def execute(self, headers=None, body=None, ignoreErrors=False):
+		try:
+			self.set_result(getattr(self.resource, self.method)(headers=headers, payload=body))
+		except:
+			if ignoreErrors:
+				self.result = None
+				self.body_string = ''
+			else:
+				raise
 
 	def set_result(self, r):
 		self.result = r
 		self.body_string = self.result.body_string()
 
 	def getEncoding(self):
-		return self.result.charset or 'utf8'
+		try:
+			return self.result.charset or 'utf8'
+		except:
+			return 'utf8'
 
 	def getBody(self):
 		return self.body_string
 
 	def getEtag(self):
-		return self.result.headers.get('etag', None)
+		try:
+			return self.result.headers.get('etag', None)
+		except:
+			return None
 
 	def getDecodedBody(self):
 		return json.loads(self.getBody(), self.getEncoding())
 
 
 class etagBook(object):
-	def __init__(self, id):
-		id = int(id)
+	def __init__(self, id, method="get", run=True):
+		if id!=None:
+			id = int(id)
 		self.uri = settings.ETAG_BOOK_URI%(id,)
-		self._resource = etagResource(self.uri)
-		self._resource.execute()
+		self._resource = etagResource(self.uri, method)
+		if run:
+			self._resource.execute()
+
+	@staticmethod
+	def createNewId():
+		r = etagResource(settings.ETAG_BOOK_POST, 'post')
+		r.execute()
+
+		print r.result
+		print r.result.headers['location']
+		url = r.result.headers['location']
+
+		import re
+		p = re.compile(".*\/([0-9]+)$")
+		id = p.findall(url)[0]
+		return int(id)
 
 	def getResource(self):
 		return self._resource
@@ -55,7 +84,17 @@ class etagBook(object):
 		None # TODO
 
 	def put(self, obj):
-		None # TODO
+		obj = json.dumps(obj)
+		r = etagResource(self.uri, 'put')
+		try:
+			h = {}
+			etag = self.getResource().getEtag()
+			if etag!=None:
+				h['If-Match'] = etag
+		except:
+			None
+		r.execute( h, body=obj)
+		return r.getBody()
 
 	def delete(self):
 		r = etagResource(self.uri, 'delete')

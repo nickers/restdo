@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from models import etagBook, ResourceNotFound
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from biblio.models import etagBooksList
+from django.core.urlresolvers import reverse
 
 def show_book(request, book_id):
 	book = etagBook(book_id)
@@ -32,6 +33,14 @@ def list_books(request, page):
 	return render_to_response('biblio/books_list.html', {'books':obj, 'page':page})
 
 def edit_book(request, id):
+	if request.method=="POST":
+		obj = request.POST
+		id = etagBook.createNewId()
+
+		r = etagBook(id, 'get', run=False)
+		r.put(obj)
+		return HttpResponseRedirect(reverse('edytuj_ksiazke', args=[id]))
+
 	print "Id: [%s]"%(id,)
 	if id=="":
 		obj = {}
