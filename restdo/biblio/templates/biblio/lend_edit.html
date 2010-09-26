@@ -1,0 +1,43 @@
+{% extends "biblio/base.html" %}
+
+{% block content %}
+
+{% if lend.id %}
+	<form action="{% url usun_wypozyczenie lend.id %}" class="edit_form alert" method="get">
+		<input type="submit" value="Usuń" />
+	</form>
+{% endif %}
+
+<form class="edit_form" action="{% url edytuj_wypozyczenie lend.id %}" method="post">
+	{% if lend.id %}<input type="hidden" value="{{ lend.id }}" name="id" />#{{ lend.id }}{% endif %}
+	<table>
+		<tr>
+			<td>
+				<b>Książka:</b> </td><td> <input size="5" type="text" value="{{ lend.book.id }}" name="book" />
+				{% if lend.book %}
+					(było #{{ lend.book.id }}. <i>"{{ lend.book.title }}"</i>, autor: {{ lend.book.author }}, wydano: {{ lend.book.pub_date }})
+				{% endif %}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<b>Czytelnik:</b> </td><td> <input size="2" type="text" value="{{ lend.reader.id }}" name="reader" />
+				{% if lend.reader %}
+					(było #{{ lend.reader.id }}. {{ lend.reader.first_name }} {{ lend.reader.last_name }})
+				{% endif %}
+			</td>
+		</tr>
+		<tr>
+			<td> <b>Termin żądania:</b> </td><td> <input type="text" value="{{ lend.request_time }}" name="request_time" /> </td>
+		</tr>
+		<tr>
+			<td> <b>Termin otrzymania:</b> </td><td> <input type="text" value="{{ lend.lend_time|default:"" }}" name="lend_time" /> </td>
+		</tr>
+		<tr>
+			<td> <b>Termin zwrotu:</b> </td><td> <input type="text" value="{{ lend.return_time|default:"" }}" name="return_time" /> </td>
+		</tr>
+	</table>
+	<input type="submit" value="Zapisz" />
+</form>
+
+{% endblock %}

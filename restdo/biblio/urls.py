@@ -12,5 +12,7 @@ urlpatterns = patterns('',
 	url(r'^reader_delete/(?P<reader_id>[0-9]+)$', 'biblio.views.delete_reader', name="usun_czytelnika"),
 	url(r'^list_readers/(?P<page>[0-9]+)$', 'biblio.views.list_readers', name='lista_czytelnikow'),
 
-	#url(r'^book/page-(?P<page_number>[0-9]+)$', books_list_handler, { 'emitter_format': 'json'}),
+	url(r'^edit_lend/(?P<id>[0-9]*)$', 'biblio.views.edit_lend', name='edytuj_wypozyczenie'),
+	url(r'^lend_delete/(?P<lend_id>[0-9]+)$', 'biblio.views.delete_lend', name="usun_wypozyczenie"),
+	url(r'^list_lends/(?P<page>[0-9]+)$', 'biblio.views.list_lends', name='lista_wypozyczen'),
 )

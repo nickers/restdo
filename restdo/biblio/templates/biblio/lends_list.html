@@ -1,0 +1,67 @@
+{% extends "biblio/base.html" %}
+
+{% block css %}
+	<style type="text/css">
+		h2.empty {
+			text-align: center;
+			color:#aca;
+			padding: 80px 10px;
+			border: 1px solid #000;
+			margin-top: 15px;
+		}
+		table {
+			width: 100%;
+			margin-top: 15px;
+		}
+		th {
+			border: 1px solid #000;
+			background: #252;
+			color: #efe;
+		}
+		td {
+			border-bottom: 1px dashed #050;
+		}
+		tr:hover {
+			background-color: #cfc;
+		}
+	</style>
+{% endblock %}
+{% block content %}
+
+<form action="{% url edytuj_wypozyczenie None %}" method="get"><input type="submit" value="Dodaj" /></form>
+
+{% if page > 0 %}[ <a href="{% url lista_wypozyczen page|add:"-1" %}">Poprzednia</a> ]{% endif %}
+{% if lends %}
+	[ <a href="{% url lista_wypozyczen page|add:"1" %}">Następna</a> ]
+	<table>
+		<tr>
+			<th>#</th>
+			<th>Książka</th>
+			<th>Czytelnik</th>
+			<th>Termin żądania</th>
+			<th>Otrzymania</th>
+			<th>Zwrotu</th>
+			<th></th>
+		</tr>
+	{% for lend in lends %}
+		<tr>
+			<td>{{ lend.id }}</td>
+			<td>#{{ lend.book.id }}. <i>"{{ lend.book.title }}"</i>, autor: {{ lend.book.author }}, wydano: {{ lend.book.pub_date }}</td>
+			<td>#{{ lend.reader.id }}. {{ lend.reader.first_name }} {{ lend.reader.last_name }}</td>
+			<td>{{ lend.request_time}}</td>
+			<td>{{ lend.lend_time|default:"-" }}</td>
+			<td>{{ lend.return_time|default:"-" }}</td>
+			<td style="text-align: center;">
+				<input onclick="javascript:document.location='{% url edytuj_wypozyczenie lend.id %}'" type="button" value="Edytuj" />
+				{% if not lend.lend_time %}<input type="button" value="Wypożycz" />{% endif %}
+				{% if lend.lend_time and not lend.return_time %}<input type="button" value="Zwróć" />{% endif %}
+			</td>
+		</tr>
+	{% endfor %}
+
+	</table>
+{% else %}
+	<h2 class="empty"><i>Pusto! :(</i></h2>
+{% endif %}
+
+{% endblock %}

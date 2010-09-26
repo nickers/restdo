@@ -4,15 +4,18 @@ from django.db.models import signals
 from books.models import Book
 from readers.models import Reader
 
-def get_pre_signal(field):
-	def item_pre_delete_signal(**kwargs):
-		if 'sender' in kwargs and kwargs['sender']==Book:
-			inst = kwargs['instance']
-			fltrs = {book:inst.id}
-			BookLend.objects.filter(**fltrs).delete()
-	return item_pre_delete_signal
-signals.pre_delete.connect(get_pre_signal('book'), sender=Book)
-signals.pre_delete.connect(get_pre_signal('reader'), sender=Reader)
+def book_pre_delete_signal(**kwargs):
+	if 'sender' in kwargs:
+		inst = kwargs['instance']
+		BookLend.objects.filter(book=inst.id).delete()
+
+def reader_pre_delete_signal(**kwargs):
+	if 'sender' in kwargs:
+		inst = kwargs['instance']
+		BookLend.objects.filter(reader=inst.id).delete()
+
+signals.pre_delete.connect(book_pre_delete_signal, sender=Book)
+signals.pre_delete.connect(reader_pre_delete_signal, sender=Reader)
 
 class BookLend(models.Model):
 	book = models.ForeignKey('books.Book', null=True, blank=True)

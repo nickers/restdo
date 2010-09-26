@@ -49,6 +49,7 @@
 			<td>{{ reader.address }}</td>
 			<td style="text-align: center;">
 				<input onclick="javascript:document.location='{% url edytuj_czytelnika reader.id %}'" type="button" value="Edytuj" />
+				<input type="button" value="Wypożycz" />
 			</td>
 		</tr>
 	{% endfor %}

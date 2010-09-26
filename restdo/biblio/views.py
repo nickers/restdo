@@ -3,7 +3,7 @@
 from models import etagBook, ResourceNotFound
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
-from biblio.models import etagBooksList, etagReader, etagReadersList, etagReadersList
+from biblio.models import etagBooksList, etagReader, etagReadersList, etagReadersList, etagLendsList, etagLend
 from django.core.urlresolvers import reverse
 
 ### BOOKS ###
@@ -98,3 +98,54 @@ def edit_reader(request, id):
 		r = etagReader(int(id))
 		obj = r.getObject()
 	return render_to_response('biblio/reader_edit.html', {'reader':obj})
+
+### LENDS ###
+def delete_lend(request, lend_id):
+	try:
+		r = etagLend(lend_id)
+		r.delete()
+		return HttpResponseRedirect(reverse('lista_wypozyczen', args=[0]))
+	except ResourceNotFound:
+		return HttpResponse("Resource not found", status=404)
+	except:
+		raise
+		return HttpResponse("Strange error", status=500)
+
+
+
+def list_lends(request, page):
+	page = int(page)
+	obj = None
+	try:
+		r = etagLendsList(page)
+		obj = r.getObject()
+	except:
+		print "Ups... some error at listing books"
+	return render_to_response('biblio/lends_list.html', {'lends':obj, 'page':page})
+
+def edit_lend(request, id):
+	if request.method=="POST":
+		obj = {}
+		for k in request.POST:
+			obj[k] = request.POST[k]
+
+		for k in ['request_time','lend_time','return_time']:
+			if obj[k]=="":
+				obj[k] = None
+
+		if id=="":
+			id = etagLend.createNewId()
+			r = etagLend(id, 'get', run=False)
+		else:
+			id=int(id)
+			r = etagLend(id, 'get')
+		r.put(obj)
+		return HttpResponseRedirect(reverse('edytuj_wypozyczenie', args=[id]))
+
+	print "Id: [%s]"%(id,)
+	if id=="":
+		obj = {}
+	else:
+		r = etagLend(int(id))
+		obj = r.getObject()
+	return render_to_response('biblio/lend_edit.html', {'lend':obj})
