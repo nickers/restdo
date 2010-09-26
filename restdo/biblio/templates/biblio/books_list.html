@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+		h2.empty {
+			text-align: center;
+			color:#aca;
+			padding: 80px 10px;
+			border: 1px solid #000;
+			margin-top: 15px;
+		}
+		table {
+			width: 100%;
+			margin-top: 15px;
+		}
+		th {
+			border: 1px solid #000;
+			background: #252;
+			color: #efe;
+		}
+		td {
+			border-bottom: 1px dashed #050;
+		}
+		tr:hover {
+			background-color: #cfc;
+		}
+	</style>
+</head>
+<body>
+
+<form action="{% url edytuj_ksiazke None %}" method="get"><input type="submit" value="Dodaj" /></form>
+
+{% if page > 0 %}[ <a href="{% url lista_ksiazek page|add:"-1" %}">Poprzednia</a> ]{% endif %}
+{% if books %}
+	[ <a href="{% url lista_ksiazek page|add:"1" %}">Następna</a> ] 
+	<table>
+		<tr>
+			<th>#</th>
+			<th>Tytuł</th>
+			<th>Autor</th>
+			<th>Data publikacji</th>
+			<th></th>
+		</tr>
+	{% for book in books %}
+		<tr>
+			<td>{{ book.id }}</td>
+			<td>{{ book.title }}</td>
+			<td>{{ book.author }}</td>
+			<td>{{ book.pub_date }}</td>
+			<td style="text-align: center;">
+				<input onclick="javascript:document.location='{% url edytuj_ksiazke book.id %}'" type="button" value="Edytuj" />
+				<input type="button" value="Wypożycz" />
+			</td>
+		</tr>
+	{% endfor %}
+
+	</table>
+{% else %}
+	<h2 class="empty"><i>Pusto! :(</i></h2>
+{% endif %}
+
+</body>
+</html>

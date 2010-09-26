@@ -1,0 +1,26 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+
+<form action="{% url edytuj_ksiazke book.id %}" method="post">
+	{% if book.id %}<input type="hidden" value="{{ book.id }}" name="id" />{% endif %}
+	<table>
+		<tr>
+			<td> <b>Tytuł:</b> </td><td> <input type="text" value="{{ book.title }}" name="title" /> </td>
+		</tr>
+		<tr>
+			<td> <b>Autor:</b> </td><td> <input type="text" value="{{ book.author }}" name="author" /> </td>
+		</tr>
+		<tr>
+			<td> <b>Termin wydania:</b> </td><td> <input type="text" value="{{ book.pub_date }}" name="pub_date" /> </td>
+		</tr>
+	</table>
+	<input type="submit" value="Zapisz" />
+</form>
+
+</body>
+</html>

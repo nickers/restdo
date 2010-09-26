@@ -65,7 +65,7 @@ SECRET_KEY = 'jx8l&0!c79opfo0yw&c2h6ho608v41_+f^z3_5osyeb4so=d@!'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+#	'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -82,6 +82,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+	'/home/nickers/workspace/restdo/restdo/',
 )
 
 INSTALLED_APPS = (
@@ -97,9 +98,11 @@ INSTALLED_APPS = (
     
     'books',
     'readers',
-    'books_lends'
+    'books_lends',
+	'biblio'
 )
 
 ## ## ##
 ETAG_RES_SERVER = 'http://localhost:8000/api/'
 ETAG_BOOK_URI = ETAG_RES_SERVER + 'book/id-%d'
+ETAG_BOOKS_LIST_URI = ETAG_RES_SERVER + 'book/page-%d'

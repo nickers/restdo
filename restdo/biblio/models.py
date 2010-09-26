@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.conf import settings
-from restkit.resource import Resource
+from restkit.resource import Resource, ResourceNotFound
 import simplejson as json
 
 class etagResource(object):
@@ -34,11 +34,11 @@ class etagBook(object):
 	def __init__(self, id):
 		id = int(id)
 		self.uri = settings.ETAG_BOOK_URI%(id,)
-		self.__resource = etagResource(self.uri)
-		self.__resource.execute()
+		self._resource = etagResource(self.uri)
+		self._resource.execute()
 
 	def getResource(self):
-		return self.__resource
+		return self._resource
 
 	def getObject(self):
 		return self.getResource().getDecodedBody()
@@ -47,8 +47,8 @@ class etagBook(object):
 		return self.getResource().getBody()
 
 	def get(self):
-		self.__resource = etagResource(self.uri)
-		self.__resource.execute()
+		self._resource = etagResource(self.uri)
+		self._resource.execute()
 		return self.getObject()
 
 	def post(self, obj):
@@ -61,5 +61,23 @@ class etagBook(object):
 		r = etagResource(self.uri, 'delete')
 		r.execute({'If-Match':self.getResource().getEtag()})
 		self.getResource().set_result(r)
-		return self.getObject()
+		return self.getString()
 
+
+
+class etagBooksList(etagBook):
+	def __init__(self, id):
+		id = int(id)
+		self.uri = settings.ETAG_BOOKS_LIST_URI%(id,)
+		self._resource = etagResource(self.uri)
+		self._resource.execute()
+
+
+	def post(self, obj):
+		None # TODO
+
+	def put(self, obj):
+		None # TODO
+
+	def delete(self):
+		return None
