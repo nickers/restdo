@@ -14,10 +14,12 @@ def show_book(request, book_id):
 def delete_book(request, book_id):
 	try:
 		book = etagBook(book_id)
-		return HttpResponse(book.delete())
+		book.delete()
+		return HttpResponseRedirect(reverse('lista_ksiazek', args=[0]))
 	except ResourceNotFound:
 		return HttpResponse("Resource not found", status=404)
 	except:
+		raise
 		return HttpResponse("Strange error", status=500)
 
 

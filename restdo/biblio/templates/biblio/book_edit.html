@@ -2,8 +2,14 @@
 
 {% block content %}
 
+{% if book.id %}
+	<form action="{% url usun_ksiazke book.id %}" class="edit_form alert" method="get">
+		<input type="submit" value="Usuń" />
+	</form>
+{% endif %}
+
 <form class="edit_form" action="{% url edytuj_ksiazke book.id %}" method="post">
-	{% if book.id %}<input type="hidden" value="{{ book.id }}" name="id" />{% endif %}
+	{% if book.id %}<input type="hidden" value="{{ book.id }}" name="id" />#{{ book.id }}{% endif %}
 	<table>
 		<tr>
 			<td> <b>Tytuł:</b> </td><td> <input type="text" value="{{ book.title }}" name="title" /> </td>

@@ -22,7 +22,10 @@ class etagResource(object):
 
 	def set_result(self, r):
 		self.result = r
-		self.body_string = self.result.body_string()
+		if callable(self.result.body_string):
+			self.body_string = self.result.body_string()
+		else:
+			self.body_string = self.result.body_string
 
 	def getEncoding(self):
 		try:
@@ -100,7 +103,7 @@ class etagBook(object):
 		r = etagResource(self.uri, 'delete')
 		r.execute({'If-Match':self.getResource().getEtag()})
 		self.getResource().set_result(r)
-		return self.getString()
+		return self.getString()==""
 
 
 
@@ -111,12 +114,11 @@ class etagBooksList(etagBook):
 		self._resource = etagResource(self.uri)
 		self._resource.execute()
 
-
 	def post(self, obj):
-		None # TODO
+		return None
 
 	def put(self, obj):
-		None # TODO
+		return None
 
 	def delete(self):
 		return None
