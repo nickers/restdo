@@ -123,5 +123,6 @@ class UpdatableModels(BaseHandler):
 				return HttpResponse(status=412) # precondition failed
 		except self.model.DoesNotExist:
 			None
-		return super(UpdatableModels, self).delete(request, **kwargs)
+		item_id = {'id':int(kwargs['id'])}
+		return super(UpdatableModels, self).delete(request, **item_id)
 
