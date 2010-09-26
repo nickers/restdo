@@ -8,6 +8,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
 	
 	(r'^api/', include('api.urls')),
+	(r'^biblio/', include('biblio.urls')),
 	# Example:
 	# (r'^restdo/', include('restdo.foo.urls')),
 	

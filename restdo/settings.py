@@ -99,3 +99,7 @@ INSTALLED_APPS = (
     'readers',
     'books_lends'
 )
+
+## ## ##
+ETAG_RES_SERVER = 'http://localhost:8000/api/'
+ETAG_BOOK_URI = ETAG_RES_SERVER + 'book/id-%d'
