@@ -7,7 +7,7 @@ class Reader(models.Model):
 	address = models.TextField(null=True, blank=True)
 
 	def __unicode__(self):
-		return u"%s %s"%(self.first_name, self.last_name)
+		return u"#%d) %s %s"%(self.id, self.first_name, self.last_name)
 
 	def isEmpty(self):
 		attrs = ['first_name','last_name']
