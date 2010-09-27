@@ -176,10 +176,26 @@ def grant_lend(request, id, page):
 		info = json.loads(e.message)
 		return render_to_response('biblio/request_failed.html', {'info':info})
 
+def grant_lend_book(request, id, book):
+	try:
+		lend_mod(int(id), 'lend_time', time.strftime("%Y-%m-%d %H:%M:%S"))
+		return HttpResponseRedirect(reverse('kolejka_pokaz', args=[book]))
+	except RequestFailed, e:
+		info = json.loads(e.message)
+		return render_to_response('biblio/request_failed.html', {'info':info})
+
 def return_lend(request, id, page):
 	try:
 		lend_mod(int(id), 'return_time', time.strftime("%Y-%m-%d %H:%M:%S"))
 		return HttpResponseRedirect(reverse('lista_wypozyczen', args=[page]))
+	except RequestFailed, e:
+		info = json.loads(e.message)
+		return render_to_response('biblio/request_failed.html', {'info':info})
+
+def return_lend_book(request, id, book):
+	try:
+		lend_mod(int(id), 'return_time', time.strftime("%Y-%m-%d %H:%M:%S"))
+		return HttpResponseRedirect(reverse('kolejka_pokaz', args=[book]))
 	except RequestFailed, e:
 		info = json.loads(e.message)
 		return render_to_response('biblio/request_failed.html', {'info':info})

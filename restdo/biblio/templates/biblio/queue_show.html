@@ -43,7 +43,7 @@
 {% endblock %}
 {% block content %}
 
-<form action="{% url edytuj_wypozyczenie None %}" method="get"><input type="submit" value="Dodaj" /></form>
+<form action="{% url edytuj_wypozyczenie None %}" method="get"><input type="submit" value="Aktualizuj" /></form>
 
 
 {% if lends %}
@@ -90,8 +90,8 @@
 			<td style="text-align: center;">
 				<input onclick="javascript:document.location='{% url edytuj_wypozyczenie lend.id %}'" type="button" value="Edytuj" />
 
-
-				{% if lend.lend_time and not lend.return_time %}<input type="button" value="Zwróć" onclick="javascript:document.location='{% url zwroc_wypozyczenie page=page id=lend.id %}'"/>{% endif %}
+				{% if not lend.lend_time %}<input type="button" value="Wypożycz" onclick="javascript:document.location='{% url daj_wypozyczenie_book book=lend.book.id id=lend.id %}'" />{% endif %}
+				{% if lend.lend_time and not lend.return_time %}<input type="button" value="Zwróć" onclick="javascript:document.location='{% url zwroc_wypozyczenie_book book=lend.book.id id=lend.id %}'"/>{% endif %}
 			</td>
 		</tr>
 	{% endfor %}
