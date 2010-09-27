@@ -218,5 +218,15 @@ def queue_show(request, book_id):
 		obj = lends.getObject()
 	except:
 		print "Ups... some error at listing book's #%s lends queue"%(book_id,)
-		raise
 	return render_to_response('biblio/queue_show.html', {'lends':obj})
+
+def queue_delete(request, book, id):
+	book = int(book)
+	id = int(id)
+	try:
+		lends = etagQueueList(book)
+		lends.delete(id)
+	except:
+		print "Ups... some error at deleting book's #%s lend item #%s"%(book,id)
+		raise
+	return HttpResponseRedirect(reverse('kolejka_pokaz', args=[book]))

@@ -276,6 +276,7 @@ class etagLendsList(etagLend):
 class etagQueueList(etagBook):
 	def __init__(self, id):
 		id = int(id)
+		self.id = id
 		self.uri = settings.ETAG_QUEUE_LIST_URI%(id,)
 		self._resource = etagResource(self.uri)
 		self._resource.execute()
@@ -289,11 +290,11 @@ class etagQueueList(etagBook):
 	def getString(self):
 		return self.getResource().getBody()
 
-	def post(self, obj):
-		return None
-
-	def put(self, obj):
-		return None
-
-	def delete(self):
-		return None
+	def delete(self, id):
+		id = int(id)
+		uri = settings.ETAG_QUEUE_ITEM_URI%(self.id, id)
+		r = etagResource(uri, 'get')
+		r.execute()
+		r2 = etagResource(uri, 'delete')
+		r2.execute({'If-Match':r.getEtag()})
+		return r2.getBody()==""

@@ -23,4 +23,5 @@ urlpatterns = patterns('',
 	url(r'^queue_books/$', 'biblio.views.queue_list_books', kwargs={'page':0}, name='kolejka_lista_ksiazek_menu'),
 	url(r'^queue_books/(?P<page>[0-9]+)$', 'biblio.views.queue_list_books', name='kolejka_lista_ksiazek'),
 	url(r'^queue/(?P<book_id>[0-9]+)$', 'biblio.views.queue_show', name='kolejka_pokaz'),
+	url(r'^queue/(?P<book>[0-9]+)/(?P<id>[0-9]+)$', 'biblio.views.queue_delete', name='kolejka_usun'),
 )

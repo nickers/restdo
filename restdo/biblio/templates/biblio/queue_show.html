@@ -88,8 +88,9 @@
 			<td>{{ lend.lend_time|default:"-" }}</td>
 			<td>{{ lend.return_time|default:"-" }}</td>
 			<td style="text-align: center;">
+				<input type="button" value="Przekaż dalej" onclick="javascript:document.location='{% url kolejka_usun book=lend.book.id id=lend.id %}'"/>
+			|
 				<input onclick="javascript:document.location='{% url edytuj_wypozyczenie lend.id %}'" type="button" value="Edytuj" />
-
 				{% if not lend.lend_time %}<input type="button" value="Wypożycz" onclick="javascript:document.location='{% url daj_wypozyczenie_book book=lend.book.id id=lend.id %}'" />{% endif %}
 				{% if lend.lend_time and not lend.return_time %}<input type="button" value="Zwróć" onclick="javascript:document.location='{% url zwroc_wypozyczenie_book book=lend.book.id id=lend.id %}'"/>{% endif %}
 			</td>
