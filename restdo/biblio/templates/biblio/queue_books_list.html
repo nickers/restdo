@@ -1,0 +1,59 @@
+{% extends "biblio/base.html" %}
+
+{% block css %}
+	<style type="text/css">
+		h2.empty {
+			text-align: center;
+			color:#aca;
+			padding: 80px 10px;
+			border: 1px solid #000;
+			margin-top: 15px;
+		}
+		table {
+			width: 100%;
+			margin-top: 15px;
+		}
+		th {
+			border: 1px solid #000;
+			background: #252;
+			color: #efe;
+		}
+		td {
+			border-bottom: 1px dashed #050;
+		}
+		tr:hover {
+			background-color: #cfc;
+		}
+	</style>
+{% endblock %}
+{% block content %}
+
+{% if page > 0 %}[ <a href="{% url kolejka_lista_ksiazek page|add:"-1" %}">Poprzednia</a> ]{% endif %}
+{% if books %}
+	[ <a href="{% url kolejka_lista_ksiazek page|add:"1" %}">Następna</a> ] 
+	<table>
+		<tr>
+			<th>#</th>
+			<th>Tytuł</th>
+			<th>Autor</th>
+			<th>Data publikacji</th>
+			<th></th>
+		</tr>
+	{% for book in books %}
+		<tr>
+			<td>{{ book.id }}</td>
+			<td>{{ book.title }}</td>
+			<td>{{ book.author }}</td>
+			<td>{{ book.pub_date }}</td>
+			<td style="text-align: center;">
+				<input onclick="javascript:document.location='{% url kolejka_pokaz book_id=book.id %}'" type="button" value="Pokaz kolejke" />
+			</td>
+		</tr>
+	{% endfor %}
+
+	</table>
+{% else %}
+	<h2 class="empty"><i>Pusto! :(</i></h2>
+{% endif %}
+
+{% endblock %}

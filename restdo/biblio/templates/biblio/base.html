@@ -55,7 +55,7 @@
 	<a href="{% url lista_ksiazek 0 %}">Książki</a>
 	<a href="{% url lista_czytelnikow 0 %}">Czytelnicy</a>
 	<a href="{% url lista_wypozyczen 0 %}">Wypożyczenia</a>
-	<a href="">Kolejka oczekujących</a>
+	<a href="{% url kolejka_lista_ksiazek 0 %}">Kolejka oczekujących</a>
 </div>
 
 {% block content %}

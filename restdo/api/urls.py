@@ -15,6 +15,7 @@ readers_list_handler = Resource(ReadersListHandler)
 books_queue_handler = Resource(BooksQueueHandler)
 
 urlpatterns = patterns('',
+   url(r'^book/$', books_list_handler, { 'emitter_format': 'json', 'page_number': 0}),
    url(r'^book/page-(?P<page_number>[0-9]+)$', books_list_handler, { 'emitter_format': 'json'}),
    url(r'^book/(?P<id>[^/]*)$', book_handler, { 'emitter_format': 'json' }, 'books_api'),
 
@@ -25,6 +26,6 @@ urlpatterns = patterns('',
    url(r'^reader/(?P<id>[^/]*)$', reader_handler, { 'emitter_format': 'json' }, 'reader_api'),
 
    # r'^book/id-(?P<book_id>[^/]+)/queue/$
-   url(r'^book/id-(?P<book_id>[^/]+)/queue$', books_queue_handler, { 'emitter_format': 'json' }, 'queue_api'),
+   url(r'^book/(?P<book_id>[^/]+)/queue$', books_queue_handler, { 'emitter_format': 'json' }, 'queue_api'),
    url(r'^book/(?P<book_id>[^/]+)/queue/(?P<id>[^/]+)$', books_queue_handler, { 'emitter_format': 'json' }),
 )

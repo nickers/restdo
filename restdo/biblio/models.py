@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.conf import settings
-from restkit.resource import Resource, ResourceNotFound
+from restkit.resource import Resource, ResourceNotFound, RequestFailed
 import simplejson as json
 
 class etagResource(object):
@@ -262,6 +262,32 @@ class etagLendsList(etagLend):
 		self.uri = settings.ETAG_LENDS_LIST_URI%(id,)
 		self._resource = etagResource(self.uri)
 		self._resource.execute()
+
+	def post(self, obj):
+		return None
+
+	def put(self, obj):
+		return None
+
+	def delete(self):
+		return None
+
+### QUEUE ###
+class etagQueueList(etagBook):
+	def __init__(self, id):
+		id = int(id)
+		self.uri = settings.ETAG_QUEUE_LIST_URI%(id,)
+		self._resource = etagResource(self.uri)
+		self._resource.execute()
+
+	def getResource(self):
+		return self._resource
+
+	def getObject(self):
+		return self.getResource().getDecodedBody()
+
+	def getString(self):
+		return self.getResource().getBody()
 
 	def post(self, obj):
 		return None

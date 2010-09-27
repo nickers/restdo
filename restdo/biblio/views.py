@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from models import etagBook, ResourceNotFound
+from models import etagBook, ResourceNotFound, RequestFailed
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
-from biblio.models import etagBooksList, etagReader, etagReadersList, etagReadersList, etagLendsList, etagLend
+from biblio.models import etagBooksList, etagReader, etagReadersList, etagReadersList, etagLendsList, etagLend, etagQueueList
 from django.core.urlresolvers import reverse
+import simplejson as json
+import time
+
+
 
 ### BOOKS ###
+
 def show_book(request, book_id):
 	book = etagBook(book_id)
 	#return HttpResponse(book.getResource().getBody())
@@ -124,28 +129,78 @@ def list_lends(request, page):
 	return render_to_response('biblio/lends_list.html', {'lends':obj, 'page':page})
 
 def edit_lend(request, id):
-	if request.method=="POST":
-		obj = {}
-		for k in request.POST:
-			obj[k] = request.POST[k]
+	try:
+		if request.method=="POST":
+			obj = {}
+			for k in request.POST:
+				obj[k] = request.POST[k]
 
-		for k in ['request_time','lend_time','return_time']:
-			if obj[k]=="":
-				obj[k] = None
+			for k in ['request_time','lend_time','return_time']:
+				if obj[k]=="":
+					obj[k] = None
 
+			if id=="":
+				id = etagLend.createNewId()
+				r = etagLend(id, 'get', run=False)
+			else:
+				id=int(id)
+				r = etagLend(id, 'get')
+			r.put(obj)
+			return HttpResponseRedirect(reverse('edytuj_wypozyczenie', args=[id]))
+
+		print "Id: [%s]"%(id,)
 		if id=="":
-			id = etagLend.createNewId()
-			r = etagLend(id, 'get', run=False)
+			obj = {}
 		else:
-			id=int(id)
-			r = etagLend(id, 'get')
-		r.put(obj)
-		return HttpResponseRedirect(reverse('edytuj_wypozyczenie', args=[id]))
+			r = etagLend(int(id))
+			obj = r.getObject()
+		return render_to_response('biblio/lend_edit.html', {'lend':obj})
+	except RequestFailed, e:
+		info = json.loads(e.message)
+		return render_to_response('biblio/request_failed.html', {'info':info})
 
-	print "Id: [%s]"%(id,)
-	if id=="":
-		obj = {}
-	else:
-		r = etagLend(int(id))
-		obj = r.getObject()
-	return render_to_response('biblio/lend_edit.html', {'lend':obj})
+def lend_mod(id, k, v):
+	r = etagLend(int(id))
+	obj = r.getObject()
+	for id_field in ['book','reader']:
+		obj[id_field] = obj[id_field]['id']
+	obj[k] = v
+	print obj
+	r.put(obj)
+
+def grant_lend(request, id, page):
+	try:
+		lend_mod(int(id), 'lend_time', time.strftime("%Y-%m-%d %H:%M:%S"))
+		return HttpResponseRedirect(reverse('lista_wypozyczen', args=[page]))
+	except RequestFailed, e:
+		info = json.loads(e.message)
+		return render_to_response('biblio/request_failed.html', {'info':info})
+
+def return_lend(request, id, page):
+	try:
+		lend_mod(int(id), 'return_time', time.strftime("%Y-%m-%d %H:%M:%S"))
+		return HttpResponseRedirect(reverse('lista_wypozyczen', args=[page]))
+	except RequestFailed, e:
+		info = json.loads(e.message)
+		return render_to_response('biblio/request_failed.html', {'info':info})
+
+### QUEUE ###
+def queue_list_books(request, page):
+	page = int(page)
+	obj = None
+	try:
+		books = etagBooksList(page)
+		obj = books.getObject()
+	except:
+		print "Ups... some error at listing books"
+	return render_to_response('biblio/queue_books_list.html', {'books':obj, 'page':page})
+
+def queue_show(request, book_id):
+	book_id = int(book_id)
+	try:
+		lends = etagQueueList(book_id)
+		obj = lends.getObject()
+	except:
+		print "Ups... some error at listing book's #%s lends queue"%(book_id,)
+		raise
+	return render_to_response('biblio/queue_show.html', {'lends':obj})

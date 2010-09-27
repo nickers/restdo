@@ -13,7 +13,7 @@
 	<table>
 		<tr>
 			<td>
-				<b>Książka:</b> </td><td> <input size="5" type="text" value="{{ lend.book.id }}" name="book" />
+				<b>Książka:</b> </td><td> <input size="4" type="text" value="{{ lend.book.id }}" name="book" />
 				{% if lend.book %}
 					(było #{{ lend.book.id }}. <i>"{{ lend.book.title }}"</i>, autor: {{ lend.book.author }}, wydano: {{ lend.book.pub_date }})
 				{% endif %}
@@ -21,7 +21,7 @@
 		</tr>
 		<tr>
 			<td>
-				<b>Czytelnik:</b> </td><td> <input size="2" type="text" value="{{ lend.reader.id }}" name="reader" />
+				<b>Czytelnik:</b> </td><td> <input size="4" type="text" value="{{ lend.reader.id }}" name="reader" />
 				{% if lend.reader %}
 					(było #{{ lend.reader.id }}. {{ lend.reader.first_name }} {{ lend.reader.last_name }})
 				{% endif %}

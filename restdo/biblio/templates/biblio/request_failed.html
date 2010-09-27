@@ -1,0 +1,44 @@
+{% extends "biblio/base.html" %}
+
+{% block css %}
+<style type="text/css">
+	.error_info {
+		margin: 4em;
+		padding: 2em;
+		font-size: 1.5em;
+		color: #a33;
+		border: 1px solid #a33;
+		background-color: #fee;
+	}
+
+	.error_info p.back {
+		text-align: center;
+	}
+
+	.error_info a {
+		text-decoration: none;
+	}
+
+	.error_info a:hover {
+		text-decoration: underline;
+	}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error_info">
+<p>Wystąpił błąd.</p>
+
+{{ info }}
+
+{% if info.invalid_key %}
+	Podano wartość wskazującą na nieistaniejący obiekt - <i>{{ info.invalid_key }}</i>.
+{% endif %}
+
+{% if info.msg == "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format." %}
+	Podano datę w nieprawidłowym formacie. Proszę użyć formatu: YYYY-MM-DD HH:MM[:ss[.uuuuuu]].
+{% endif %}
+
+	<p class="back">[<a href="javascript:history.go(-1)"> Wstecz </a>]</p>
+</div>
+{% endblock %}

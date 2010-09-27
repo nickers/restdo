@@ -177,7 +177,8 @@ class BooksQueueHandler(BaseHandler):
 		if 'id' in kwargs:
 			item = self.getBooksQueryItem(book_id, kwargs['id'])
 			if item==None:
-				return rc.NOT_HERE
+				#return rc.NOT_HERE
+				return []
 			return item
 		query = self.getBooksQuery(book_id)
 		return query

@@ -24,19 +24,56 @@
 		tr:hover {
 			background-color: #cfc;
 		}
+
+		table.small {
+			width: auto;
+			border: 1px solid #000;
+		}
+		table.small td {
+			border: 0 none #000;
+			padding: 0 10px;
+		}
+
+		td.title {
+			font-weight: bold;
+			background-color: #000;
+			color: #fff;
+		}
 	</style>
 {% endblock %}
 {% block content %}
 
 <form action="{% url edytuj_wypozyczenie None %}" method="get"><input type="submit" value="Dodaj" /></form>
 
-{% if page > 0 %}[ <a href="{% url lista_wypozyczen page|add:"-1" %}">Poprzednia</a> ]{% endif %}
+
 {% if lends %}
-	[ <a href="{% url lista_wypozyczen page|add:"1" %}">Następna</a> ]
+
+	{% with lends|first as lend %}
+
+	Książka:
+	<table class="small">
+	<tr>
+		<td class="title">ID</td>
+		<td>#{{ lend.book.id }}</td>
+	</tr>
+	<tr>
+		<td class="title">Tytuł</td>
+		<td><i>"{{ lend.book.title }}"</i></td>
+	</tr>
+	<tr>
+		<td class="title">Autor</td>
+		<td>{{ lend.book.author }}</td>
+	</tr>
+	<tr>
+		<td class="title">Data publikacji</td>
+		<td>{{ lend.book.pub_date }}</td>
+	</tr>
+		</table>
+	{% endwith %}
+
 	<table>
 		<tr>
 			<th>#</th>
-			<th>Książka</th>
 			<th>Czytelnik</th>
 			<th>Termin żądania</th>
 			<th>Otrzymania</th>
@@ -46,7 +83,6 @@
 	{% for lend in lends %}
 		<tr>
 			<td>{{ lend.id }}</td>
-			<td>#{{ lend.book.id }}. <i>"{{ lend.book.title }}"</i>, autor: {{ lend.book.author }}, wydano: {{ lend.book.pub_date }}</td>
 			<td>#{{ lend.reader.id }}. {{ lend.reader.first_name }} {{ lend.reader.last_name }}</td>
 			<td>{{ lend.request_time}}</td>
 			<td>{{ lend.lend_time|default:"-" }}</td>
@@ -54,7 +90,7 @@
 			<td style="text-align: center;">
 				<input onclick="javascript:document.location='{% url edytuj_wypozyczenie lend.id %}'" type="button" value="Edytuj" />
 
-				{% if not lend.lend_time %}<input type="button" value="Wypożycz" onclick="javascript:document.location='{% url daj_wypozyczenie page=page id=lend.id %}'" />{% endif %}
+
 				{% if lend.lend_time and not lend.return_time %}<input type="button" value="Zwróć" onclick="javascript:document.location='{% url zwroc_wypozyczenie page=page id=lend.id %}'"/>{% endif %}
 			</td>
 		</tr>
