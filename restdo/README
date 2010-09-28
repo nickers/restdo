@@ -1,2 +1,360 @@
-empty :P
+Zasoby:
+
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+
+URI: /api/books?page={page}
+INFO: Lista książek z podziałem na strony
+METODY:
+	# GET
+		- pobranie strony z listą książek
+		- ciało zapytania: puste
+		- format wyjściowy: json - opis książki = klasa o polach:
+			+ author / string - autor pozycji
+			+ pub_date / data - data publikacji
+			+ id / int - numer identyfikacyjny pozycji
+			+ title / string - tytuł pozycji
+
+			przykład - 2 książki:
+			[
+				{
+					"author": "Tadeusz Marchewka",
+					"pub_date": "2010-10-01",
+					"id": 22,
+					"title": "Nowa"
+				},
+				{
+					"author": "Adam Mickiewicz",
+					"pub_date": "1999-01-22",
+					"id": 14,
+					"title": "Stara"
+				}
+			]
+
+
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+
+URI: /api/book/, /api/book/{id}
+INFO: Pojedyncza książka
+METODY:
+	# GET /api/book/{id}
+		- pobranie informacji o książce
+		- ciało zapytania: puste
+		- format wyjściowy: json - lista opisów książek (patrz wyżej)
+
+	# POST /api/book/
+		- utworzenie nowej pozycji o unikalnym id i przekazanie
+		  pozycji tego zasobu
+		- ciało zapytania: puste
+		- format wyjściowy: ciało puste, status "302 Found", dodatkowy
+		  nagłowek 'Location', którego wartość to URI nowego zasobu
+
+	# PUT /api/book/{id}
+		- utworzenie nowego zasobu o podanym id lub aktualizacja
+		  istniejącego
+		- ciało zapytania: json - opis pozycji = klasa o polach:
+			+ author / string - autor pozycji
+			+ pub_date / data - data publikacji
+			+ id / int - pozycja opcjonalna, ignorowana
+			+ title / string - tytuł pozycji
+		- w przypadku istniejącego zasobu wymagany jest nagłówek
+		  'If-Match' z wartością Etag zwróconą przez metodą GET tego
+		  zasobu
+
+	# DELETE /api/book/{id}
+		- usunięcie zasobu
+		- ciało zapytania: puste
+		- wymagany nagłówek 'If-Match'
+
+
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+
+URI: /api/readers?page={page}
+INFO: Lista czytelników zapisanych do czytelni.
+METODY:
+	# GET
+		- pobranie strony z listą czytelników
+		- ciało zapytania: puste
+		- format wyjściowy: json - lista obiektów opisujących
+		  czytelnika o następujących polach:
+			+ first_name / string - imię czytelnika
+			+ last_name / string - nazwisko czytelnika
+			+ address / string - adres zamieszkania czytelnika
+			+ id / int - numer id zasobu czytelnika
+
+			przykład - 2 czytelników:
+			[
+				{
+					"first_name": "Tomasz",
+					"last_name": "Wsuł",
+					"id": 1,
+					"address": "Kotuń 13A m.3"
+				},
+				{
+					"first_name": "Stanisław",
+					"last_name": "Kowal",
+					"id": 23,
+					"address": "Dąbrowa górnicza 12, 54-233 Zamieszadło"
+				}
+			]
+
+
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+
+URI: /api/reader/, /api/reader/{id}
+	# GET /api/reader/{id}
+		- pobranie opisu czytelnika
+		- ciało zapytania: puste
+		- format wyjściowy: json - pojedynczy obiekt opisujący czytelnika
+		  o formacie jak przy GET /api/readers?page={page}
+		  przykład:
+			{
+				"first_name": "Tomasz",
+				"last_name": "Wsuł",
+				"id": 1,
+				"address": "Kotuń 13A m.3"
+			}
+
+	# POST /api/reader/
+		- utworzenie nowej pozycji o unikalnym id i przekazanie
+		  pozycji tego zasobu
+		- ciało zapytania: puste
+		- format wyjściowy: ciało puste, status "302 Found", dodatkowy
+		  nagłowek 'Location', którego wartość to URI nowego zasobu
+
+	# PUT /api/reader/{id}
+		- utworzenie nowego zasobu o podanym id lub aktualizacja
+		  istniejącego
+		- ciało zapytania: json - obiekt opisujący czytelnika
+		  o następujących polach:
+		  	+ first_name / string - imię czytelnika
+			+ last_name / string - nazwisko czytelnika
+			+ address / string - adres zamieszkania czytelnika
+			+ id / int - pole opcjonalne i ignorowane - numer id zasobu czytelnika
+		  	{
+				"first_name": "Tomasz",
+				"last_name": "Wsuł",
+				"address": "Kotuń 13A m.3"
+			}
+		- w przypadku istniejącego zasobu wymagany jest nagłówek
+		  'If-Match' z wartością Etag zwróconą przez metodą GET tego
+		  zasobu
+
+	# DELETE /api/reader/{id}
+		- usunięcie zasobu
+		- ciało zapytania: puste
+		- wymagany nagłówek 'If-Match'
+
+
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+
+URI: /api/lends?page={page}
+INFO: Lista wypożyczeń książek. Page - numer strony >=0
+METODY:
+	# GET
+		- pobranie strony z listą wypożyczeń
+		- ciało zapytania: puste
+		- format wyjściowy: json - lista obiektów opisujących
+		  wypożyczenie o następujących polach:
+			+ request_time / data[null] - data utworzenia zasobu (kiedy
+			  zostało wysłane żądanie wypożyczenia książki), null - brak
+			+ lend_time / data[null] - data wypożyczenia książki,
+			  null - brak
+			+ return_time / data[null] - rzeczywista data zwrotu
+			  książki, null - brak
+			+ book / json object - pełen opis książki(jak wyżej)
+			+ reader / json object - pełen opis czytelnika(jak wyżej)
+			+ id / int - numer id zasobu wypożyczenia
+
+			przykład - 1 wypożyczenie:
+			[
+				{
+					"request_time": "2010-10-10 00:00:00",
+					"lend_time": null,
+					"return_time": null,
+					"book": {
+						"author": "Autor",
+						"pub_date": "2010-01-01",
+						"id": 22,
+						"title": "Nowa"
+					},
+					"reader": {
+						"first_name": "Tomasz",
+						"last_name": "Wsuł",
+						"id": 1,
+						"address": "Kotuń 13A m.3"
+					},
+					"id": 1
+				}
+			]
+
+
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+
+URI: /api/lend/, /api/lend/{id}
+INFO: Pojedyncze wypożyczenie.
+METODY:
+	# GET /api/lend/{id}
+		- pobranie opisu wypożyczenia
+		- ciało zapytania: puste
+		- format wyjściowy: json - pojedynczy obiekt opisujący wypożyczenie
+		  o formacie jak przy GET /api/lends?page={page}
+		  przykład:
+			{
+				"request_time": "2010-10-10 00:00:00",
+				"lend_time": null,
+				"return_time": null,
+				"book": {
+					"author": "Autor",
+					"pub_date": "2010-01-01",
+					"id": 22,
+					"title": "Nowa"
+				},
+				"reader": {
+					"first_name": "Tomasz",
+					"last_name": "Wsuł",
+					"id": 1,
+					"address": "Kotuń 13A m.3"
+				},
+				"id": 1
+			}
+
+	# POST /api/lend/
+		- utworzenie nowej pozycji o unikalnym id i przekazanie
+		  pozycji tego zasobu
+		- ciało zapytania: puste
+		- format wyjściowy: ciało puste, status "302 Found", dodatkowy
+		  nagłowek 'Location', którego wartość to URI nowego zasobu
+
+	# PUT /api/lend/{id}
+		- utworzenie nowego zasobu o podanym id lub aktualizacja
+		  istniejącego
+		- ciało zapytania: json - obiekt opisujący wypożyczenie
+		  o następujących polach:
+			+ request_time / data[null] - data utworzenia zasobu (kiedy
+			  zostało wysłane żądanie wypożyczenia książki),
+			  null - brak, format YYYY-MM-DD HH:MM[:SS]
+			+ lend_time / data[null] - data wypożyczenia książki,
+			  null - brak, format YYYY-MM-DD HH:MM[:SS]
+			+ return_time / data[null] - rzeczywista data zwrotu
+			  książki, null - brak, format YYYY-MM-DD HH:MM[:SS]
+			+ book / int - id książki do wypożyczenia
+			+ reader / int - id czytelnika wypożyczającego
+			+ id / int - pozycja opcjonalna i ignorowana
+			  przykład tworzący zasób zwracany w przykładzie dla GET /api/lend/{id}:
+				{
+					"request_time": "2010-10-10 00:00:00",
+					"lend_time": null,
+					"return_time": null,
+					"book": 22,
+					"reader": 1
+				}
+		- w przypadku istniejącego zasobu wymagany jest nagłówek
+		  'If-Match' z wartością Etag zwróconą przez metodą GET tego
+		  zasobu
+
+	# DELETE /api/lend/{id}
+		- usunięcie zasobu
+		- ciało zapytania: puste
+		- wymagany nagłówek 'If-Match'
+
+
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+
+URI: /api/book/{book_id}/queue
+	# GET
+		- pobranie strony z listą wypożyczeń danej książek
+		- ciało zapytania: puste
+		- format wyjściowy: json - lista obiektów opisujących
+		  wypożyczenie danej książki. Format jak w przypadku
+		  GET /api/lend/{id}
+
+			przykład - 2 wypożyczenia:
+			[
+				{
+					"request_time": "2010-10-10 00:00:00",
+					"lend_time": "2010-10-10 00:00:00",
+					"return_time": null,
+					"book": {
+						"author": "Autor",
+						"pub_date": "2010-01-01",
+						"id": 22,
+						"title": "Nowa"
+					},
+					"reader": {
+						"first_name": "Tomasz",
+						"last_name": "Wsuł",
+						"id": 1,
+						"address": "Kotuń 13A m.3"
+					},
+					"id": 1
+				},
+				{
+					"request_time": "2010-10-10 00:00:02",
+					"lend_time": null,
+					"return_time": null,
+					"book": {
+						"author": "Autor",
+						"pub_date": "2010-01-01",
+						"id": 22,
+						"title": "Nowa"
+					},
+					"reader": {
+						"first_name": "Stanisław",
+						"last_name": "Kowal",
+						"id": 23,
+						"address": "Dąbrowa górnicza 12, 54-233 Zamieszadło"
+					},
+					"id": 2
+				}
+			]
+
+
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+
+URI: /api/book/{book_id}/queue/{lend_id}
+INFO: Lista niezakończonych (return_time==NULL) wypożyczeń danej
+	  książki uporządkowana w kolejności rosnącej wg pola
+	  'request_time'.
+METODY:
+	# GET
+		- pobranie opisu wypożyczenia danej książki
+		- ciało zapytania: puste
+		- format wyjściowy: json - pojedynczy obiekt opisujący
+		  wypożyczenie o formacie jak przy GET /api/lend/{id}
+		  przykład:
+			{
+				"request_time": "2010-10-10 00:00:00",
+				"lend_time": null,
+				"return_time": null,
+				"book": {
+					"author": "Autor",
+					"pub_date": "2010-01-01",
+					"id": 22,
+					"title": "Nowa"
+				},
+				"reader": {
+					"first_name": "Tomasz",
+					"last_name": "Wsuł",
+					"id": 1,
+					"address": "Kotuń 13A m.3"
+				},
+				"id": 1
+			}
+
+	# DELETE
+		- ustawia wartość "return_time" na aktualny czas dla obiektu
+		  pierwszego w kolejce. Jeśli pozostałe pozycje w liście mają
+		  w polu "lend_time" wartość NULL dla pierwszej pozycji
+		  ustawiany jest aktualny czas w polu "lend_time" (książka
+		  jest przekazywana następnej osobie).
+		- ciało zapytania: puste
+		- wymagany nagłówek 'If-Match'
 
