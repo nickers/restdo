@@ -35,7 +35,11 @@ class BookHandler(UpdatableModels):
 class BooksListHandler(BookHandler):
 	allowed_methods = ('GET')
 
-	def read(self, request, page_number, *args, **kwargs):
+	def read(self, request, *args, **kwargs):
+		try:
+			page_number = int(request.GET['page'])
+		except:
+			return rc.BAD_REQUEST
 		if int(page_number)<0:
 			return rc.NOT_HERE
 		list = super(BooksListHandler, self).read(request, *args, **kwargs).order_by(self.model._meta.pk.name)
@@ -68,7 +72,11 @@ class BookLendHandler(UpdatableModels):
 class BookLendsListHandler(BookLendHandler):
 	allowed_methods = ('GET')
 
-	def read(self, request, page_number, *args, **kwargs):
+	def read(self, request, *args, **kwargs):
+		try:
+			page_number = int(request.GET['page'])
+		except:
+			return rc.BAD_REQUEST
 		if int(page_number)<0:
 			return rc.NOT_HERE
 		list = super(BookLendsListHandler, self).read(request, *args, **kwargs).order_by(self.model._meta.pk.name)
@@ -99,7 +107,11 @@ class ReaderHandler(UpdatableModels):
 class ReadersListHandler(ReaderHandler):
 	allowed_methods = ('GET')
 
-	def read(self, request, page_number, *args, **kwargs):
+	def read(self, request, *args, **kwargs):
+		try:
+			page_number = int(request.GET['page'])
+		except:
+			return rc.BAD_REQUEST 
 		if int(page_number)<0:
 			return rc.NOT_HERE
 		list = super(ReadersListHandler, self).read(request, *args, **kwargs).order_by(self.model._meta.pk.name)
