@@ -1,3 +1,17 @@
+Uwagi ogólne:
+
+Pola oznaczone * są polami wymaganymi (wartości muszą być różne od
+Null/None). Jeśli którekolwiek pole wymagane nie spełnia tego
+warunku - zasób jest uznawany za pusty i nieistniejący (410 GONE).
+
+Aktualizacja zasobów polega na zamianie wartości pól wysłanych
+wraz z żądaniem a wartości pozostałych zasobów pozostają bez
+zmian (jeśli jeszcze nie zdefiniowano wartości jest to Null).
+W ten sposób nie trzeba wysyłać całego zasobu by zmienić wartość
+jednego pola. Jednak by usunąć wartość dla danego pola należy
+explicite nadać mu wartość Null. Oczywiście nic nie stoi na
+przeszkodzie, by każdorazowo wysyłać cały zasób.
+
 Zasoby:
 
 ---------------------------------------------------------------------
@@ -130,8 +144,8 @@ URI: /api/reader/, /api/reader/{id}
 		  istniejącego
 		- ciało zapytania: json - obiekt opisujący czytelnika
 		  o następujących polach:
-		  	+ first_name / string - imię czytelnika
-			+ last_name / string - nazwisko czytelnika
+		  	+ first_name* / string - imię czytelnika
+			+ last_name* / string - nazwisko czytelnika
 			+ address / string - adres zamieszkania czytelnika
 			+ id / int - pole opcjonalne i ignorowane - numer id zasobu czytelnika
 		  	{
@@ -236,15 +250,15 @@ METODY:
 		  istniejącego
 		- ciało zapytania: json - obiekt opisujący wypożyczenie
 		  o następujących polach:
-			+ request_time / data[null] - data utworzenia zasobu (kiedy
+			+ request_time* / data[null] - data utworzenia zasobu (kiedy
 			  zostało wysłane żądanie wypożyczenia książki),
 			  null - brak, format YYYY-MM-DD HH:MM[:SS]
 			+ lend_time / data[null] - data wypożyczenia książki,
 			  null - brak, format YYYY-MM-DD HH:MM[:SS]
 			+ return_time / data[null] - rzeczywista data zwrotu
 			  książki, null - brak, format YYYY-MM-DD HH:MM[:SS]
-			+ book / int - id książki do wypożyczenia
-			+ reader / int - id czytelnika wypożyczającego
+			+ book* / int - id książki do wypożyczenia
+			+ reader* / int - id czytelnika wypożyczającego
 			+ id / int - pozycja opcjonalna i ignorowana
 			  przykład tworzący zasób zwracany w przykładzie dla GET /api/lend/{id}:
 				{
