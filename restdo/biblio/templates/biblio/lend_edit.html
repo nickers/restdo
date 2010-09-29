@@ -13,7 +13,8 @@
 	<table>
 		<tr>
 			<td>
-				<b>Książka:</b> </td><td> <input size="4" type="text" value="{{ lend.book.id }}" name="book" />
+				<b>Książka:</b> </td><td> <input size="4" type="text" value="{{ lend.book.id }}" name="book" id="book" />
+				<input type="button" value="..." onclick="javascript:window.showModalDialog('{%  url listowalne 'books' 0 %}', document.getElementById('book'), 'unadorned:1;dialogWidth:700;dialogHeight:300;center:1')">
 				{% if lend.book %}
 					(było #{{ lend.book.id }}. <i>"{{ lend.book.title }}"</i>, autor: {{ lend.book.author }}, wydano: {{ lend.book.pub_date }})
 				{% endif %}
@@ -21,7 +22,8 @@
 		</tr>
 		<tr>
 			<td>
-				<b>Czytelnik:</b> </td><td> <input size="4" type="text" value="{{ lend.reader.id }}" name="reader" />
+				<b>Czytelnik:</b> </td><td> <input size="4" type="text" value="{{ lend.reader.id }}" name="reader" id="reader" />
+				<input type="button" value="..." onclick="javascript:window.showModalDialog('{%  url listowalne 'readers' 0 %}', document.getElementById('reader'), 'unadorned:1;dialogWidth:700;dialogHeight:300;center:1')">
 				{% if lend.reader %}
 					(było #{{ lend.reader.id }}. {{ lend.reader.first_name }} {{ lend.reader.last_name }})
 				{% endif %}

@@ -29,14 +29,18 @@
 <div class="error_info">
 <p>Wystąpił błąd.</p>
 
-{{ info }}
-
 {% if info.invalid_key %}
 	Podano wartość wskazującą na nieistaniejący obiekt - <i>{{ info.invalid_key }}</i>.
-{% endif %}
-
-{% if info.msg == "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format." %}
+{% else %}
+	{% if info.msg == "Enter a valid date/time in YYYY-MM-DD HH:MM[:ss[.uuuuuu]] format." %}
 	Podano datę w nieprawidłowym formacie. Proszę użyć formatu: YYYY-MM-DD HH:MM[:ss[.uuuuuu]].
+	{% else %}
+		{% if info.msg == "Not all required fields filled in." %}
+			Nie wypełniono wszystkich wymaganych pól.
+		{% else %}
+			{{ info.msg }}
+		{% endif %}
+	{% endif %}
 {% endif %}
 
 	<p class="back">[<a href="javascript:history.go(-1)"> Wstecz </a>]</p>

@@ -1,6 +1,50 @@
-{% extends "biblio/base.html" %}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>biblio</title>
+	<style type="text/css">
+		.menu {
+			border: 0px solid #000;
+			padding: 7px;
+			border-bottom: 1px dashed #3c3;
+			height: 1.5em;
+			font-size: 2em;
+			margin-bottom: 1em;
+		}
+		.menu a {
+			padding: 5px;
+			background-color: #c33;
+			border: 1px solid #000;
+			color: #000;
+			text-decoration: none;
+			margin: 0 5px;
+			display: block;
+			float: left;
+		}
+		.menu a:hover {
+			background-color: #000;
+			color: #c33;
+		}
 
-{% block css %}
+		.edit_form {
+			width: 100%;
+			border: 1px solid #000;
+			padding: 10px;
+		}
+
+		.alert {
+			margin: 10px 0;
+			color: #c00;
+			background-color: #fee;
+		}
+
+		.alert input {
+			color: #c00;
+			font-size: 1.5em;
+		}
+	</style>
+
 	<style type="text/css">
 		h2.empty {
 			text-align: center;
@@ -24,9 +68,17 @@
 		tr:hover {
 			background-color: #cfc;
 		}
+
+		#cancel {
+			width: 70%;
+			margin: 3em;
+			margin-bottom: 0;
+		}
 	</style>
-{% endblock %}
-{% block content %}
+</head>
+<body>
+
+
 
 
 {% if page > 0 %}[ <a href="{% url listowalne type page|add:"-1" %}">Poprzednia</a> ]{% endif %}
@@ -39,10 +91,10 @@
 	{% for item in items %}
 		<tr>
 
-				<td>{{ item }}</td>
+				<td>{{ item.text }}</td>
 
 			<td style="text-align: center;">
-				<input onclick="javascript:document.location='{% url edytuj_ksiazke book.id %}'" type="button" value="Wybierz" />
+				<input onclick="javascript:window.dialogArguments.value='{{ item.value }}';window.close();" type="button" value="Wybierz" />
 			</td>
 		</tr>
 	{% endfor %}
@@ -52,4 +104,7 @@
 	<h2 class="empty"><i>Pusto! :(</i></h2>
 {% endif %}
 
-{% endblock %}
+<div style="text-align: center;"><input id="cancel" onclick="javascript:window.close();" type="button" value="Anuluj" /></div>
+
+</body>
+</html>

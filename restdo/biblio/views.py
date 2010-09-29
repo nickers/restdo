@@ -129,6 +129,7 @@ def list_lends(request, page):
 	return render_to_response('biblio/lends_list.html', {'lends':obj, 'page':page})
 
 def edit_lend(request, id):
+	request.method
 	try:
 		if request.method=="POST":
 			obj = {}
@@ -156,7 +157,10 @@ def edit_lend(request, id):
 			obj = r.getObject()
 		return render_to_response('biblio/lend_edit.html', {'lend':obj})
 	except RequestFailed, e:
-		info = json.loads(e.message)
+		try:
+			info = json.loads(e.message)
+		except:
+			info = {'msg':e.message}
 		return render_to_response('biblio/request_failed.html', {'info':info})
 
 def lend_mod(id, k, v):
@@ -246,7 +250,7 @@ def choose_listable(request, type, page):
 	try:
 		list = etagListables(type,int(page))
 		obj = list.getObject()
-		obj = [', '.join(unicode(s) for s in [names[type][i]+unicode(o[i]) for i in orders[type]]) for o in obj]
+		obj = [{'value':o['id'], 'text':', '.join(unicode(s) for s in [names[type][i]+unicode(o[i]) for i in orders[type]])} for o in obj]
 	except RequestFailed:
 		obj = []
 	return render_to_response('biblio/choose_listable.html', {'items':obj, 'page':page, 'type':type})
