@@ -105,6 +105,12 @@ class UpdatableModels(BaseHandler):
 				bad_request['Content-Type'] = 'application/json; charset=utf-8'
 				return bad_request
 		try:
+			if obj.isEmpty():
+				bad_request = rc.BAD_REQUEST
+				msg = {'msg':u'Not all required fields filled in.'}
+				bad_request.content = json.dumps(msg, encoding='utf-8')
+				bad_request['Content-Type'] = 'application/json; charset=utf-8'
+				return bad_request
 			obj.save()
 		except ValidationError, e:
 			bad_request = rc.BAD_REQUEST
