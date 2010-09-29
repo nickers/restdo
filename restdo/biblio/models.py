@@ -298,3 +298,24 @@ class etagQueueList(etagBook):
 		r2 = etagResource(uri, 'delete')
 		r2.execute({'If-Match':r.getEtag()})
 		return r2.getBody()==""
+
+### ### ###
+class etagListables(object):
+	def __init__(self, type, page):
+		self.uri = settings.ETAG_LISTABLES_ITEMS_URI%(type,int(page))
+		self._resource = etagResource(self.uri)
+		self._resource.execute()
+
+	def getResource(self):
+		return self._resource
+
+	def getObject(self):
+		return self.getResource().getDecodedBody()
+
+	def getString(self):
+		return self.getResource().getBody()
+
+	def get(self):
+		self._resource = etagResource(self.uri)
+		self._resource.execute()
+		return self.getObject()

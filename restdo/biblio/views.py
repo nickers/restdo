@@ -3,7 +3,7 @@
 from models import etagBook, ResourceNotFound, RequestFailed
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
-from biblio.models import etagBooksList, etagReader, etagReadersList, etagReadersList, etagLendsList, etagLend, etagQueueList
+from biblio.models import etagBooksList, etagReader, etagReadersList, etagReadersList, etagLendsList, etagLend, etagQueueList, etagListables, etagListables
 from django.core.urlresolvers import reverse
 import simplejson as json
 import time
@@ -230,3 +230,23 @@ def queue_delete(request, book, id):
 		print "Ups... some error at deleting book's #%s lend item #%s"%(book,id)
 		raise
 	return HttpResponseRedirect(reverse('kolejka_pokaz', args=[book]))
+
+#### #### #### #### ####
+def choose_listable(request, type, page):
+	page = int(page)
+	names = {
+		'books' : {'id':u'#', 'title':u'Tytuł: ', 'author':u'Autor: ', 'pub_date':u'Data publikacji: '},
+		'readers' : {'id':u'#', 'first_name':u'Imię: ', 'last_name':u'Nazwisko: ', 'address':u'Adres: '}
+	}
+
+	orders = {
+		'books' : ['id', 'title', 'author', 'pub_date'],
+		'readers' : ['id', 'first_name', 'last_name', 'address']
+	}
+	try:
+		list = etagListables(type,int(page))
+		obj = list.getObject()
+		obj = [', '.join(unicode(s) for s in [names[type][i]+unicode(o[i]) for i in orders[type]]) for o in obj]
+	except RequestFailed:
+		obj = []
+	return render_to_response('biblio/choose_listable.html', {'items':obj, 'page':page, 'type':type})
